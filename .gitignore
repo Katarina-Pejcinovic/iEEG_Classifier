@@ -162,3 +162,5 @@ cython_debug/
 Features_Matrix.csv
 Labels_Matrix.csv
 .DS_Store
+.venv 
+feature_data.pkl
