@@ -15,19 +15,23 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import power_transform
 from sklearn.metrics import fbeta_score, accuracy_score, precision_score, recall_score
+import pickle as pkl
 
 # Load Features + Labels Datasets
 def load_data(file_path_data, file_path_labels):
 
-    features_matrix = np.genfromtxt(file_path_data, delimiter=',')
+    #features_matrix = np.genfromtxt(file_path_data, delimiter=',')
     labels_matrix = np.genfromtxt(file_path_labels, delimiter=',')
+
+    with open('feature_data.pkl', 'rb') as f:
+        features_matrix = pkl.load(f)
+
+    print(features_matrix.shape)
 
     # Extract Pandas DF with only Physio and Patho Segments
     segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
 
     # print(segments_file)
-    
-
     segments_df = segments_file[segments_file['category_id'].isin([2,3])]
     segments_df = segments_df.reset_index(drop=True)
     segments_df = segments_df.drop(columns=['index'])
@@ -88,8 +92,17 @@ def load_data(file_path_data, file_path_labels):
     group_6_labels = [labels_list[14], labels_list[17], labels_list[20]]
 
     group_labels_list = [group_1_labels, group_2_labels, group_3_labels, group_4_labels, group_5_labels, group_6_labels]
-    
+    patients = [0, 1, 2, 3, 4, 5, 7, 8, 14, 16, 17, 18, 20, 21, 23]
+    groups = []
+    for patient in patients:
+        print("patient id", patient)
 
-    return features_matrix, labels_matrix, group_labels_list
+        repeat = np.repeat(patient, len(labels_list[patient]))
+        #print("repeated", repeat)
+        for i in range(len(labels_list[patient])):
+            groups.append(patient)
 
-load_data('Features_Matrix.csv', 'Labels_Matrix.csv')
+        print("size", len(groups))
+
+    groups = np.array(groups)
+    return features_matrix, labels_matrix[:,0], groups
