@@ -1,23 +1,29 @@
 import pickle as pkl
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit
 import numpy as np
 from numpy import genfromtxt
 
-# my_data = genfromtxt('Features_Matrix.csv', delimiter=',')
-
-# with open('feature_data.pkl', 'wb') as file: 
-#     # A new file will be created 
-#     pkl.dump(my_data, file) 
-
-my_labels = genfromtxt('Labels_Matrix.csv', delimiter = ',')
-
-# Split the data into training and testing sets
-with open('feature_data.pkl', 'rb') as f:
-    feat_data = pkl.load(f)
-
-print(feat_data.shape)
-print(my_labels)
 
 
+def train_test_split(data, labels, groups):
+    gss = GroupShuffleSplit(n_splits=1, train_size=0.8, random_state=2)
 
-X_train, X_test, y_train, y_test = train_test_split(feat_data, my_labels, test_size=0.2, random_state=42)
+    for train_index, test_index in gss.split(data, labels, groups):
+        print("Train:", train_index)
+        print("Test:", test_index)
+        print("  Unique groups:", np.unique(groups[train_index]))
+
+        print("\nTest:")
+        print("  Index:", test_index)
+        print("  Unique groups:", np.unique(groups[test_index]))
+
+        # Get numpy arrays for training and testing data
+        train_data, test_data = data[train_index], data[test_index]
+        train_labels, test_labels = labels[train_index], labels[test_index]
+        train_groups, test_groups = groups[train_index], groups[test_index]
+
+        return train_data, test_data, train_labels, test_labels, train_groups, test_groups
+
+    return 
+    
+    

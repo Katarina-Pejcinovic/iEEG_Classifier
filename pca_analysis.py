@@ -2,10 +2,12 @@
 
 from sklearn.decomposition import PCA
 from scaling_features import scale_features
+import numpy as np 
 
 # Script to visualize PCA variance and decide number of components that explain 90% of the variance
 
 pca_all = PCA()
+features_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',') 
 
 # Determine transformed features
 X_PCA = pca_all.fit_transform(scale_features(features_matrix))
@@ -37,6 +39,7 @@ for i in cum_sum_eigenvalues_all:
         # print("We need " + str(num_comp_all) + " principal components to explain 90% of the variance.")
         break
         
+print("num eigenvales", num_comp_all)
 # print("Variance explained by " + str(num_comp_all) + " components = " + str(cum_sum_eigenvalues_all[num_comp_all-1] * 100) + '%')
 
 # define function to run PCA
