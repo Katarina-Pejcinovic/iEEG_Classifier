@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
 
 # Import Libraries
 
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import scipy.stats as stats
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -15,8 +13,8 @@ from sklearn.metrics import fbeta_score, accuracy_score, precision_score, recall
 
 # Load Features + Labels Datasets
 
-features_matrix = np.genfromtxt('/Users/soulaimanebentaleb/Desktop/Research/Features Matrix.csv', delimiter=',')
-labels_matrix = np.genfromtxt('/Users/soulaimanebentaleb/Desktop/Research/Labels Matrix.csv', delimiter=',')
+features_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',')
+labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
 
 # Print Dimensions of Features and Labels Matrices
 
@@ -30,8 +28,7 @@ soz_labels = labels_matrix[:,1]
 # print(physio_patho_labels.shape)
 
 # Extract Pandas DF with only Physio and Patho Segments
-
-segments_file = pd.read_csv('/Users/soulaimanebentaleb/Desktop/Research/DATASET_MAYO/segments.csv')
+segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
 
 # print(segments_file)
 
@@ -39,7 +36,7 @@ segments_df = segments_file[segments_file['category_id'].isin([2,3])]
 segments_df = segments_df.reset_index(drop=True)
 segments_df = segments_df.drop(columns=['index'])
 
-# print(segments_df)
+#print("segments", segments_df)
 
 # Create features and labels lists for the 24 patients and 6 groups of 3
 
@@ -57,17 +54,16 @@ for i in tqdm(range(len(segments_df))):
             break
         p+=1
 
-# print(len(indices_list))
+print("len indices", len(indices_list))
+#print(indices_list)
 
 # create features list with all 24 patients' features
-
 features_list = [None] * 24
 
 for i in tqdm(range(24)):
     features_list[i] = features_matrix[indices_list[i].astype(int)]
 
 # create labels list with all 24 patients' labels
-
 labels_list = [None] * 24
 
 for i in tqdm(range(24)):
@@ -83,7 +79,7 @@ group_5_features = [features_list[6], features_list[7], features_list[8]]
 group_6_features = [features_list[14], features_list[17], features_list[20]]
 
 group_features_list = [group_1_features, group_2_features, group_3_features, group_4_features, group_5_features, group_6_features]
-
+print("features list", len(features_list[0]))
 # create a list with the labels from patients in each group
 
 group_1_labels = [labels_list[0], labels_list[18], labels_list[21]]
@@ -95,6 +91,7 @@ group_6_labels = [labels_list[14], labels_list[17], labels_list[20]]
 
 group_labels_list = [group_1_labels, group_2_labels, group_3_labels, group_4_labels, group_5_labels, group_6_labels]
 
+'''
 # define function to scale features using z-score
 
 def scale_features(features):
@@ -185,3 +182,4 @@ def PCA_KMeans(features):
     scaled_features = scale_features(features)
     X_PCA = run_PCA(scaled_features)
     pred_labels = run_KMeans(X_PCA)
+'''
