@@ -1,18 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
+from sklearn.cluster import KMeans
 
 # define function to run K-Means
-import numpy as np
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import power_transform
 
-def run_KMeans(data):
-    np.random.seed(0)
+def run_KMeans(train_data, test_data):
     kmeans = KMeans(n_clusters=2, random_state=1, n_init='auto')
-    kmeans.fit(power_transform(data))
-    pred_labels = kmeans.predict(power_transform(data))
+    kmeans.fit(train_data)
+    pred_labels = kmeans.predict(test_data)
     return pred_labels
-
