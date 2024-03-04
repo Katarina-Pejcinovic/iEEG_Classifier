@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier  # You can replace this with
 import pickle as pkl
 import pandas as pd 
 
-def manaul_cross_val(data_folds, label_folds):
+def manual_cross_val(data_folds, label_folds):
 
     num_folds = len(data_folds)
     accuracy_scores = []
