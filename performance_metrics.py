@@ -1,6 +1,3 @@
-
-
-
 from sklearn.metrics import fbeta_score, accuracy_score, precision_score, recall_score
 import numpy as np
 # define function to calculate performance metrics (accuracy, precision, recall, and F2 score)
@@ -18,4 +15,3 @@ def get_performance_metrics(true_labels, pred_labels):
     recall = recall_score(true_labels, pred_labels)
     f2 = fbeta_score(true_labels, pred_labels, beta=2)
     return np.array([accuracy, precision, recall, f2])
-

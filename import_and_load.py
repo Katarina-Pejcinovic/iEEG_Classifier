@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
 # Import Libraries
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
 import scipy.stats as stats
@@ -20,16 +16,16 @@ import pickle as pkl
 # Load Features + Labels Datasets
 def load_data(file_path_data, file_path_labels):
 
-    #features_matrix = np.genfromtxt(file_path_data, delimiter=',')
+    features_matrix = np.genfromtxt(file_path_data, delimiter=',')
     labels_matrix = np.genfromtxt(file_path_labels, delimiter=',')
 
-    with open('feature_data.pkl', 'rb') as f:
-        features_matrix = pkl.load(f)
+    # with open('feature_data.pkl', 'rb') as f:
+    #     features_matrix = pkl.load(f)
 
     print(features_matrix.shape)
 
     # Extract Pandas DF with only Physio and Patho Segments
-    segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
+    segments_file = pd.read_csv('/Users/soulaimanebentaleb/Desktop/Research/DATASET_MAYO/segments.csv')
 
     # print(segments_file)
     segments_df = segments_file[segments_file['category_id'].isin([2,3])]
