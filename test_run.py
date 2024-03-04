@@ -11,5 +11,5 @@ get_groups(data, labels, groups, 5)
 
 data_PCA = run_PCA(data, 39)
 train_data, test_data, train_labels, test_labels, train_groups, test_groups = train_test_split(data_PCA, labels, groups)
-get_groups(train_data, train_labels, train_groups, 4)
-metrics = run_CV(data_PCA, labels, groups, 'SVM', 4)
+get_groups(train_data, train_labels, train_groups, 2)
+metrics = run_CV(data_PCA, labels, groups, 'SVM', 2)

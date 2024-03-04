@@ -26,7 +26,7 @@ def load_data(file_path_data, file_path_labels):
     with open('feature_data.pkl', 'rb') as f:
         features_matrix = pkl.load(f)
 
-    print(features_matrix.shape)
+    #print(features_matrix.shape)
 
     # Extract Pandas DF with only Physio and Patho Segments
     segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
@@ -56,7 +56,7 @@ def load_data(file_path_data, file_path_labels):
                 break
             p+=1
 
-    print("len indices", len(indices_list))
+    #print("len indices", len(indices_list))
     #print(indices_list)
 
     # create features list with all 24 patients' features
@@ -92,17 +92,31 @@ def load_data(file_path_data, file_path_labels):
     group_6_labels = [labels_list[14], labels_list[17], labels_list[20]]
 
     group_labels_list = [group_1_labels, group_2_labels, group_3_labels, group_4_labels, group_5_labels, group_6_labels]
+    for i in range(24):
+        counter_one = 0 
+        counter_zero = 0
+        labels = labels_list[i]
+        for r in range (len(labels)):
+            if (labels[r] == 0):
+                counter_zero +=1
+            else:
+                counter_one +=1
+
+        print("patient", i, '\n', counter_one, counter_zero)
+        
+
     patients = [0, 1, 2, 3, 4, 5, 7, 8, 14, 16, 17, 18, 20, 21, 23]
     groups = []
     for patient in patients:
-        print("patient id", patient)
+        #print("patient id", patient)
 
         repeat = np.repeat(patient, len(labels_list[patient]))
         #print("repeated", repeat)
         for i in range(len(labels_list[patient])):
             groups.append(patient)
 
-        print("size", len(groups))
+       # print("size", len(groups))
 
     groups = np.array(groups)
     return features_matrix, labels_matrix[:,0], groups
+
