@@ -4,42 +4,108 @@ from sklearn.metrics import accuracy_score  # You can replace this with the appr
 from sklearn.ensemble import RandomForestClassifier  # You can replace this with the model of your choice
 import pickle as pkl
 import pandas as pd 
+from pca_analysis import run_PCA
+from scaling_features import *
+from sklearn.preprocessing import power_transform
+from SVM import *
+from random_forest import * 
+from kmeans_clustering import *
+from performance_metrics import *
 
-def manaul_cross_val(data_folds, label_folds):
+def manual_cross_val(data_folds, label_folds):
 
     num_folds = len(data_folds)
-    accuracy_scores = []
+    counter = 0
+    KM_f2_list = [None] * 4
+    SVM_f2_list = [None] * 4
+    RF_f2_list = [None] * 4
+    KM_metrics_list = [None] * 4
+    SVM_metrics_list = [None] * 4
+    RF_metrics_list = [None] * 4
 
     # Perform 4-fold cross-validation
     kf = KFold(n_splits=4, shuffle=True, random_state=42)
 
     for train_index, test_index in kf.split(range(num_folds)):
-
+        
         # Select training and testing data for this fold
         train_data, test_data = np.concatenate([data_folds[i] for i in train_index]), np.concatenate([data_folds[i] for i in test_index])
         train_labels, test_labels = np.concatenate([label_folds[i] for i in train_index]), np.concatenate([label_folds[i] for i in test_index])
+        
+        print(train_data.shape)
+        print(train_labels.shape)
+        print(test_data.shape)
+        print(test_labels.shape)
 
-        # Initialize and train the model
-        model = RandomForestClassifier()  # You can replace this with the model of your choice
-        model.fit(train_data, train_labels)
+        scaled_X_train = scale_features(train_data)
+        scaled_X_test = scale_features(test_data)
 
-        # Make predictions on the test set
-        predictions = model.predict(test_data)
+        np.random.seed(0)
+        
+        pca_X_train, pca_X_test = run_PCA(scaled_X_train, scaled_X_test)
 
-        # Evaluate the model and store the accuracy score
-        accuracy = accuracy_score(test_labels, predictions)
-        accuracy_scores.append(accuracy)
+        gaussian_pca_X_train = power_transform(pca_X_train)
+        gaussian_pca_X_test = power_transform(pca_X_test)
 
-    return accuracy_scores
+        print("fold", counter)
 
-#separate data into 5 groups
+        print("KM predictions")
+        KM_predictions = run_KMeans(gaussian_pca_X_train, gaussian_pca_X_test)
+        KM_metrics_list[counter] = get_performance_metrics(test_labels, KM_predictions)
+        KM_f2_list[counter] = KM_metrics_list[counter][-1]
+
+        print("SVM predictions")
+        SVM_predictions = run_svm(gaussian_pca_X_train, gaussian_pca_X_test, train_labels)
+        SVM_metrics_list[counter] = get_performance_metrics(test_labels, SVM_predictions)
+        SVM_f2_list[counter] = SVM_metrics_list[counter][-1]
+
+        print("RF predictions")
+        RF_predictions = run_random_forest(gaussian_pca_X_train, gaussian_pca_X_test, train_labels)
+        RF_metrics_list[counter] = get_performance_metrics(test_labels, RF_predictions)
+        RF_f2_list[counter] = RF_metrics_list[counter][-1]
+
+        counter += 1
+
+    return KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list 
+
+
+def get_np_folds(data_folds, label_folds):
+    all_folds_data = []
+    for fold in range(4):
+        print("FOLD", fold)
+        #get first patient data. We will concatenate the other patients in the fold to this
+        data = np.array(data_folds[fold][0])
+        for patient in range(1, len(data_folds[fold])):
+            print("patient", patient)
+            data = np.concatenate((data, np.array(data_folds[fold][patient])), axis = 0)
+    
+        print("data shape after concat", data.shape)
+        all_folds_data.append(data)
+
+    print("doing labels")
+    all_folds_labels = []
+    for fold in range(4):
+        print("FOLD", fold)
+        #get first patient data. We will concatenate the other patients in the fold to this
+        labels = np.array(label_folds[fold][0])
+        for patient in range(1, len(label_folds[fold])):
+            print("patient", patient)
+            labels = np.concatenate((labels, np.array(label_folds[fold][patient])), axis = 0)
+    
+        print("data shape after concat", labels.shape)
+        all_folds_labels.append(labels)
+        print("--------------")
+
+    return all_folds_data, all_folds_labels
+    
+
+'''#separate data into 5 groups'''
 
 #features_matrix = np.genfromtxt(file_path_data, delimiter=',')
-labels_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',')
+labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
 
 with open('feature_data.pkl', 'rb') as f:
     features_matrix = pkl.load(f)
-
 
 # Extract Pandas DF with only Physio and Patho Segments
 segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
@@ -51,6 +117,7 @@ segments_df = segments_df.drop(columns=['index'])
 
 # create indices list for all 24 patients with the indices for physio and patho segments
 physio_patho_labels = labels_matrix[:,0]
+print(physio_patho_labels)
 soz_labels = labels_matrix[:,1]
 
 indices_list = [np.empty((0,))] * 24
@@ -78,29 +145,10 @@ labels_list = [None] * 24
 for i in (range(24)):
     labels_list[i] = physio_patho_labels[indices_list[i].astype(int)]
 
-# create a list with the features from patients in each group
-
-group_1_features = [features_list[0], features_list[18], features_list[21]]
-group_2_features = [features_list[1], features_list[9], features_list[19]]
-group_3_features = [features_list[2], features_list[5], features_list[16]]
-group_4_features = [features_list[3], features_list[4], features_list[23]]
-group_5_features = [features_list[6], features_list[7], features_list[8]]
-group_6_features = [features_list[14], features_list[17], features_list[20]]
-
-group_features_list = [group_1_features, group_2_features, group_3_features, group_4_features, group_5_features, group_6_features]
-
-# create a list with the labels from patients in each group
-
-group_1_labels = [labels_list[0], labels_list[18], labels_list[21]]
-group_2_labels = [labels_list[1], labels_list[9], labels_list[19]]
-group_3_labels = [labels_list[2], labels_list[5], labels_list[16]]
-group_4_labels = [labels_list[3], labels_list[4], labels_list[23]]
-group_5_labels = [labels_list[6], labels_list[7], labels_list[8]]
-group_6_labels = [labels_list[14], labels_list[17], labels_list[20]]
 
 '''create folds'''
-#fold 1 = 0, 1, 2
-fold_1_data = [features_list[0], features_list[1], features_list[2]]
+#fold 1 = 0, 1, 2 (testing set)
+fold_1_data =[features_list[0], features_list[1], features_list[2]]
 fold_1_labels = [labels_list[0], labels_list[1], labels_list[2]]
 
 #fold 2 = 3, 17, 23
@@ -115,13 +163,19 @@ fold_3_labels = [labels_list[4], labels_list[8], labels_list[16], labels_list[18
 fold_4_data = [features_list[5], features_list[14], features_list[20]]
 fold_4_labels = [labels_list[5], labels_list[14], labels_list[20]]
 
-#fold 5 = 7, 21 (testing)
+#fold 5 = 7, 21
 fold_5_data = [features_list[7], features_list[21]]
 fold_5_labels = [labels_list[7], labels_list[21]]
 
-data_folds = [fold_1_data, fold_2_data, fold_3_data, fold_4_data]
-label_folds = [fold_1_labels, fold_2_labels, fold_3_labels, fold_4_labels]
+data_folds = [fold_2_data, fold_3_data, fold_4_data, fold_5_data]
+label_folds = [fold_2_labels, fold_3_labels, fold_4_labels, fold_5_labels]
 
-accuracy_scores = manaul_cross_val(data_folds, label_folds)
-print("Accuracy scores for each fold:", accuracy_scores)
-print("Mean accuracy:", np.mean(accuracy_scores))
+print("made folds")
+#KM_metrics, KM_f2, SVM_metrics, SVM_f2, RF_metrics, RF_f2 = manual_cross_val(data_folds, label_folds)
+#print(KM_metrics, KM_f2, SVM_metrics, SVM_f2, RF_metrics, RF_f2)
+
+data_folds, label_folds = get_np_folds(data_folds, label_folds)
+print("len data", len(data_folds), len(label_folds))
+
+KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list  = manual_cross_val(data_folds, label_folds)
+print(KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list)
