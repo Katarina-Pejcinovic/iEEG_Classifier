@@ -3,17 +3,88 @@ from CV import get_groups, run_CV
 from pca_analysis import * 
 from train_test_split import *
 from get_mean_variance import get_mean_variance
+from manual_CV import * 
+
+'''#separate data into 5 groups'''
+
+#features_matrix = np.genfromtxt(file_path_data, delimiter=',')
+labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
+
+with open('feature_data.pkl', 'rb') as f:
+    features_matrix = pkl.load(f)
+
+# Extract Pandas DF with only Physio and Patho Segments
+segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
+
+# print(segments_file)
+segments_df = segments_file[segments_file['category_id'].isin([2,3])]
+segments_df = segments_df.reset_index(drop=True)
+segments_df = segments_df.drop(columns=['index'])
+
+# create indices list for all 24 patients with the indices for physio and patho segments
+physio_patho_labels = labels_matrix[:,0]
+print(physio_patho_labels)
+soz_labels = labels_matrix[:,1]
+
+indices_list = [np.empty((0,))] * 24
+
+for i in range(len(segments_df)):        
+    p = 0
+    while p < 24:
+        #if segment is from patient p
+        if segments_df['patient_id'][i] == p:
+            #append index to matrix
+            indices_list[p] = np.append(indices_list[p], [i], axis=0)
+            break
+        p+=1
 
 
-data, labels, groups = load_data('Features_Matrix.csv', 'Labels_Matrix.csv')
-print(data.shape)
-print(groups.shape)
-print(labels.shape)
-get_groups(data, labels, groups, 5)
+# create features list with all 24 patients' features
+features_list = [None] * 24
 
-train_data, test_data, train_labels, test_labels, train_groups, test_groups = train_test_split(data, labels, groups)
-get_groups(train_data, train_labels, train_groups, 4)
-KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list = run_CV(data, labels, groups)
+for i in range(24):
+    features_list[i] = features_matrix[indices_list[i].astype(int)]
+
+# create labels list with all 24 patients' labels
+labels_list = [None] * 24
+
+for i in (range(24)):
+    labels_list[i] = physio_patho_labels[indices_list[i].astype(int)]
+
+
+'''create folds'''
+#fold 1 = 0, 1, 2 (testing set)
+fold_1_data =[features_list[0], features_list[1], features_list[2]]
+fold_1_labels = [labels_list[0], labels_list[1], labels_list[2]]
+
+#fold 2 = 3, 17, 23
+fold_2_data = [features_list[3], features_list[17], features_list[23]]
+fold_2_labels = [labels_list[3], labels_list[17], labels_list[23]]
+
+#fold 3 = 4,8 ,16, 18
+fold_3_data = [features_list[4], features_list[8], features_list[16], features_list[18]]
+fold_3_labels = [labels_list[4], labels_list[8], labels_list[16], labels_list[18]]
+
+#fold 4 = 5, 14, 20 
+fold_4_data = [features_list[5], features_list[14], features_list[20]]
+fold_4_labels = [labels_list[5], labels_list[14], labels_list[20]]
+
+#fold 5 = 7, 21
+fold_5_data = [features_list[7], features_list[21]]
+fold_5_labels = [labels_list[7], labels_list[21]]
+
+data_folds = [fold_2_data, fold_3_data, fold_4_data, fold_5_data]
+label_folds = [fold_2_labels, fold_3_labels, fold_4_labels, fold_5_labels]
+
+print("made folds")
+
+data_folds, label_folds = get_np_folds(data_folds, label_folds)
+print("len data", len(data_folds), len(label_folds))
+
+KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list  = manual_cross_val(data_folds, label_folds)
+print("KM", '\n', KM_metrics_list, KM_f2_list, )
+print("SVM", '\n', SVM_metrics_list, SVM_f2_list, )
+print("RF", RF_metrics_list, RF_f2_list)
 
 KM_f2_mean, KM_f2_var = get_mean_variance(KM_f2_list)
 SVM_f2_mean, SVM_f2_var = get_mean_variance(SVM_f2_list)

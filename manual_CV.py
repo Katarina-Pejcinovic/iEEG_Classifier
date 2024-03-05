@@ -178,4 +178,6 @@ data_folds, label_folds = get_np_folds(data_folds, label_folds)
 print("len data", len(data_folds), len(label_folds))
 
 KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list  = manual_cross_val(data_folds, label_folds)
-print(KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list)
+print("KM", '\n', KM_metrics_list, KM_f2_list, )
+print("SVM", '\n', SVM_metrics_list, SVM_f2_list, )
+print("RF", RF_metrics_list, RF_f2_list)
