@@ -4,14 +4,13 @@ from pca_analysis import *
 from train_test_split import *
 from get_mean_variance import get_mean_variance
 from manual_CV import * 
+from MakeTable_1 import *
 
 '''#separate data into 5 groups'''
 
-#features_matrix = np.genfromtxt(file_path_data, delimiter=',')
+features_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',')
 labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
 
-with open('feature_data.pkl', 'rb') as f:
-    features_matrix = pkl.load(f)
 
 # Extract Pandas DF with only Physio and Patho Segments
 segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
@@ -96,3 +95,6 @@ print("SVM F2 mean : ", SVM_f2_mean)
 print("SVM F2 variance : ", SVM_f2_var)
 print("Random Forest F2 mean : ", RF_f2_mean)
 print("Random Forest F2 variance : ", RF_f2_var)
+
+table = format_results_to_table(KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list)
+print(table)

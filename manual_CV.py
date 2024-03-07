@@ -101,11 +101,9 @@ def get_np_folds(data_folds, label_folds):
 
 '''#separate data into 5 groups'''
 
-#features_matrix = np.genfromtxt(file_path_data, delimiter=',')
+features_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',')
 labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
 
-with open('feature_data.pkl', 'rb') as f:
-    features_matrix = pkl.load(f)
 
 # Extract Pandas DF with only Physio and Patho Segments
 segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
