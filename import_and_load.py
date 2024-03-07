@@ -20,7 +20,7 @@ def load_data(file_path_data, file_path_labels):
     with open('feature_data.pkl', 'rb') as f:
         features_matrix = pkl.load(f)
 
-    #print(features_matrix.shape)
+    #print(features_matrix.shape)pip
 
     # Extract Pandas DF with only Physio and Patho Segments
     segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
