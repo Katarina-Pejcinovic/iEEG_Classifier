@@ -6,12 +6,12 @@ from get_mean_variance import get_mean_variance
 from manual_CV import * 
 from MakeTable_1 import *
 
-features_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Features Matrix.csv', delimiter=',')
-labels_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Labels Matrix.csv', delimiter=',')
+features_matrix = np.genfromtxt('Features_Matrix.csv', delimiter=',')
+labels_matrix = np.genfromtxt('Labels_Matrix.csv', delimiter=',')
 
 
 # Extract Pandas DF with only Physio and Patho Segments
-segments_file = pd.read_csv('/Users/andresmichel/Desktop/DATASET_MAYO/segments.csv')
+segments_file = pd.read_csv('/Users/katarinapejcinovic/Downloads/DATASET_MAYO/segments.csv')
 
 # print(segments_file)
 segments_df = segments_file[segments_file['category_id'].isin([2,3])]
