@@ -6,8 +6,6 @@ from get_mean_variance import get_mean_variance
 from manual_CV import * 
 from MakeTable_1 import *
 
-'''#separate data into 5 groups'''
-
 features_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Features Matrix.csv', delimiter=',')
 labels_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Labels Matrix.csv', delimiter=',')
 
@@ -72,29 +70,22 @@ fold_4_labels = [labels_list[5], labels_list[14], labels_list[20]]
 fold_5_data = [features_list[7], features_list[21]]
 fold_5_labels = [labels_list[7], labels_list[21]]
 
-data_folds = [fold_2_data, fold_3_data, fold_4_data, fold_5_data]
-label_folds = [fold_2_labels, fold_3_labels, fold_4_labels, fold_5_labels]
+data_folds = [fold_1_data, fold_2_data, fold_3_data, fold_4_data, fold_5_data]
+label_folds = [fold_1_labels, fold_2_labels, fold_3_labels, fold_4_labels, fold_5_labels]
 
 print("made folds")
 
 data_folds, label_folds = get_np_folds(data_folds, label_folds)
-#print("len data", len(data_folds), len(label_folds))
+
 
 KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list  = manual_cross_val(data_folds, label_folds)
-# print("KM", '\n', KM_metrics_list, KM_f2_list, )
-# print("SVM", '\n', SVM_metrics_list, SVM_f2_list, )
-# print("RF", RF_metrics_list, RF_f2_list)
+
 
 KM_f2_mean, KM_f2_var = get_mean_variance(KM_f2_list)
 SVM_f2_mean, SVM_f2_var = get_mean_variance(SVM_f2_list)
 RF_f2_mean, RF_f2_var = get_mean_variance(RF_f2_list)
 
-# print("K-Means F2 mean : ", KM_f2_mean)
-# print("K-Means F2 variance : ", KM_f2_var)
-# print("SVM F2 mean : ", SVM_f2_mean)
-# print("SVM F2 variance : ", SVM_f2_var)
-# print("Random Forest F2 mean : ", RF_f2_mean)
-# print("Random Forest F2 variance : ", RF_f2_var)
+
 
 table = format_results_to_table(KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list)
 print(table)
