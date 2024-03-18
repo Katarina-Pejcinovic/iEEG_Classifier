@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score  # You can replace this with the appropriate metric for your problem
-from sklearn.ensemble import RandomForestClassifier  # You can replace this with the model of your choice
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
 import pickle as pkl
 import pandas as pd 
 from pca_analysis import run_PCA
@@ -12,6 +12,7 @@ from random_forest import *
 from kmeans_clustering import *
 from performance_metrics import *
 from sklearn.metrics import confusion_matrix
+from confusion_matrix import make_confusion_matrix
 
 def manual_cross_val(data_folds, label_folds):
 
@@ -56,7 +57,7 @@ def manual_cross_val(data_folds, label_folds):
         print("fold", counter)
 
         print("KM predictions")
-        KM_predictions = run_KMeans(gaussian_pca_X_train, gaussian_pca_X_test)
+        KM_predictions = run_KMeans(gaussian_pca_X_train, gaussian_pca_X_test, scaled_X_train, scaled_X_test)
         KM_metrics_list[counter] = get_performance_metrics(test_labels, KM_predictions)
         KM_f2_list[counter] = KM_metrics_list[counter][-1]
         concat_pred_KM = np.concatenate((concat_pred_KM, KM_predictions), axis = 0)
@@ -83,6 +84,24 @@ def manual_cross_val(data_folds, label_folds):
     np.savetxt('confusion_matricies_KM.txt', conf_matrix_KM, '%8d')
     np.savetxt('confusion_matricies_SVM.txt', conf_matrix_SVM, '%8d')
     np.savetxt('confusion_matricies_RF.txt', conf_matrix_RF, '%8d')
+    
+    labels = ['True Negative','False Positive','False Negative','True Positive']
+    categories = ['Physiological', 'Pathological']
+    make_confusion_matrix(conf_matrix_KM, 
+                        group_names=labels,
+                        categories=categories, 
+                        title='K-Means Confusion Matrix',
+                        sum_stats=False)
+    make_confusion_matrix(conf_matrix_SVM, 
+                        group_names=labels,
+                        categories=categories, 
+                        title='SVM Confusion Matrix',
+                        sum_stats=False)
+    make_confusion_matrix(conf_matrix_RF, 
+                        group_names=labels,
+                        categories=categories, 
+                        title='Random Forest Confusion Matrix',
+                        sum_stats=False)
     
     return KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list 
 
