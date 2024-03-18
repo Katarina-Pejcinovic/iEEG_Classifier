@@ -1,7 +1,6 @@
 # Import Libraries
 
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
 import scipy.stats as stats
