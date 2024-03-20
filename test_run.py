@@ -6,12 +6,14 @@ from get_mean_variance import get_mean_variance
 from manual_CV import * 
 from MakeTable_1 import *
 
-features_matrix = np.genfromtxt('/Users/soulaimanebentaleb/Desktop/Research/Features Matrix.csv', delimiter=',')
-labels_matrix = np.genfromtxt('/Users/soulaimanebentaleb/Desktop/Research/Labels Matrix.csv', delimiter=',')
+features_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Features Matrix.csv', delimiter=',')
+labels_matrix = np.genfromtxt('/Users/andresmichel/Desktop/Labels Matrix.csv', delimiter=',')
+
+
 
 
 # Extract Pandas DF with only Physio and Patho Segments
-segments_file = pd.read_csv('/Users/soulaimanebentaleb/Desktop/Research/DATASET_MAYO/segments.csv')
+segments_file = pd.read_csv('/Users/andresmichel/Desktop/DATASET_MAYO/segments.csv')
 
 # print(segments_file)
 segments_df = segments_file[segments_file['category_id'].isin([2,3])]
@@ -89,3 +91,7 @@ RF_f2_mean, RF_f2_var = get_mean_variance(RF_f2_list)
 
 table = format_results_to_table(KM_metrics_list, KM_f2_list, SVM_metrics_list, SVM_f2_list, RF_metrics_list, RF_f2_list)
 print(table)
+
+print(KM_f2_list)
+print(SVM_f2_list)
+print(RF_f2_list)
